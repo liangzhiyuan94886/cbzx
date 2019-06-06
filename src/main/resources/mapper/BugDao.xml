@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.testdev.cbzx.dao.BugDao">
+
+    <select id="getBugByPage" resultType="com.testdev.cbzx.entity.Bug">
+        select * from bug
+        limit ${page}, ${pageSize}
+    </select>
+
+    <!--按项目严重等级查询未关闭缺陷-->
+    <select id="getBugTest" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT project,severity,count(*) as count
+        FROM bug
+        WHERE project in (SELECT pid from product WHERE deleted = 0) AND deleted = 0 and ISNULL(closedBy) or resolution != 10000
+        GROUP BY project,severity
+    </select>
+
+    <!--按项目严重等级查询未关闭缺陷-->
+    <select id="getBuginfo" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        `name` as title,
+        severity,
+        count(*) AS count
+        FROM
+        bug b,
+        product p
+        WHERE
+        p.pid = b.project
+            AND b.project = #{pid}
+            AND p.deleted =0
+            AND b.deleted =0
+            AND (ISNULL(b.closedBy) OR b.resolution != 10000)
+        GROUP BY
+        project,severity
+    </select>
+
+    <!--查询每个 缺陷关闭所需时间-->
+    <select id="getBugSpendDate" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        NAME as projectName,
+        SUM(closedDate)-SUM(openedDate) AS difference,
+        COUNT(*) AS bugCount
+        FROM
+        bug b,
+        product p
+        WHERE
+        p.pid = b.project
+        <if test="_parameter != null">
+            AND b.project = #{pid}
+            AND b.closedDate IS NOT NULL
+        </if>
+        GROUP BY
+        name
+    </select>
+
+    <!--查到没有缺陷的情况下，查询product的信息-->
+    <select id="getProductinfo" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+            SELECT name AS title FROM product WHERE pid = #{parseInt}
+    </select>
+
+
+</mapper>

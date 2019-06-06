@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.testdev.cbzx.dao.ProductDao">
+    <resultMap id="ProductResultMap" type="com.testdev.cbzx.entity.Product">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="pid" jdbcType="VARCHAR" property="pid" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
+        <result column="createdBy" jdbcType="VARCHAR" property="createdBy" />
+        <result column="createdDate" jdbcType="TIMESTAMP" property="createdDate" />
+        <result column="platform" jdbcType="TINYINT" property="platform" />
+        <result column="deleted" jdbcType="VARCHAR" property="deleted" />
+    </resultMap>
+
+    <select id="getProduct" resultMap="ProductResultMap">
+        select pid,name from product where deleted = 0
+    </select>
+</mapper>
