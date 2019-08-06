@@ -17,4 +17,19 @@ public class ProductDaoImpl implements ProductDao{
     public List<Product> getProduct() {
         return productDao.getProduct();
     }
+
+    /*
+     * 根据项目主键查询缺陷地址
+     * */
+    @Override
+    public Product getBugAddressByProject(Integer project) {
+        return productDao.getBugAddressByProject(project);
+    }
+
+    @Override
+    public List<Integer> getDefaultDisplay() {
+        return productDao.getDefaultDisplay();
+    }
+
+
 }

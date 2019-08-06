@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.testdev.cbzx.dao.ManageDao">
+
+    <!--查询项目类型-->
+    <select id="getProductType" resultType="com.testdev.cbzx.entity.ProductType">
+        SELECT id, productType FROM product_type
+    </select>
+
+    <!--查询全部项目-->
+    <select id="getProduct" resultType="com.testdev.cbzx.entity.Product">
+        SELECT
+            pid,
+            NAME,
+            t.productType,
+            address,
+            display,
+            type
+        FROM
+            product p
+            LEFT JOIN ( SELECT * FROM product_type ) t ON p.type = t.id
+        WHERE
+            p.deleted = 0
+    </select>
+
+    <!--根据类型id查询某类型项目-->
+    <select id="getProductById" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Product">
+        SELECT
+            pid,
+            NAME,
+            productType,
+            address,
+            display,
+            type
+        FROM
+            product p,
+            (SELECT productType FROM product_type WHERE id = #{id}) t
+        WHERE
+            type = #{id}
+            AND deleted = 0
+    </select>
+
+    <!--更新地址 不更新分类-->
+    <select id="updateByPidNoType"  resultType="com.testdev.cbzx.entity.Product">
+        UPDATE product SET address = #{address}, display = #{display} WHERE pid = #{pid}
+    </select>
+
+    <!--更新分类和地址 -->
+    <select id="updateByPid"  resultType="com.testdev.cbzx.entity.Product">
+        UPDATE product SET type = #{type}, address = #{address}, display = #{display} WHERE pid = #{pid}
+    </select>
+
+    <!--删除分类 -->
+    <select id="deleteType"  resultType="com.testdev.cbzx.entity.ProductType">
+        DELETE FROM product_type WHERE id = #{id}
+    </select>
+
+    <!--更新分类 -->
+    <select id="updateType"  resultType="com.testdev.cbzx.entity.ProductType">
+        UPDATE product_type SET productType = #{typeName} WHERE id = #{id}
+    </select>
+
+    <!--添加分类 -->
+    <select id="addType"  resultType="com.testdev.cbzx.entity.ProductType">
+        INSERT INTO product_type (productType) VALUES(#{typeName})
+    </select>
+
+    <!--在product添加项目 -->
+    <select id="addProduct" parameterType="com.testdev.cbzx.entity.Product" resultType="com.testdev.cbzx.entity.Product">
+        INSERT INTO product (pid,name,type,address) VALUES(#{pid},#{name},#{type},#{address})
+    </select>
+
+    <!--在issuse添加项目 -->
+    <select id="addProductIntoIssuse" parameterType="com.testdev.cbzx.entity.Product" resultType="com.testdev.cbzx.entity.Product">
+        INSERT INTO issues (uid,projectName) VALUES(#{pid},#{name})
+    </select>
+
+
+</mapper>

@@ -1,27 +1,20 @@
-/*function getBugLevel(){//获取缺陷等级
-    var pid = 1;//根据项目pid查
-    $.ajax({
-        type : "get",
-        dataType : "json",
-        url : "/getBugLevel",
-        data : {"pid": pid},
-        success : function(data) {
-            dataBugLevel = data;
-            dataBugLevel.push("总数");
-        }
-    });
-}*/
-
-    function stackedbar(projectName,dataUrgent,dataSerious,dataOrdinary,dataSlight){
-
-    var option = {
+function stackedbar(projectName,dataUrgent,dataSerious,dataOrdinary,dataSlight){
+    var option = {//缺陷等级分布
         title: {
-            text: '项目缺陷分布'
+            text: ''
         },
         tooltip : {
             trigger: 'axis',
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
                 type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        toolbox: {
+            feature: {
+                dataView: {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'tiled','stack']},
+                restore: {show: true},
+                saveAsImage: {show: true}
             }
         },
         legend: {
@@ -34,11 +27,11 @@
             containLabel: true
         },
         xAxis:  {
-            type: 'value'
-        },
-        yAxis: {
             type: 'category',
             data: projectName//项目名称
+        },
+        yAxis: {
+            type: 'value'
         },
         series: [
             {
@@ -47,8 +40,8 @@
                 stack: '总量',
                 label: {
                     normal: {
-                        show: true,
-                        position: 'insideRight'
+                        show: false,
+                        position: ''
                     }
                 },
                 data: dataUrgent//紧急缺陷
@@ -59,8 +52,8 @@
                 stack: '总量',
                 label: {
                     normal: {
-                        show: true,
-                        position: 'insideRight'
+                        show: false,
+                        position: ''
                     }
                 },
                 data: dataSerious//严重缺陷
@@ -71,8 +64,8 @@
                 stack: '总量',
                 label: {
                     normal: {
-                        show: true,
-                        position: 'insideRight'
+                        show: false,
+                        position: ''
                     }
                 },
                 data: dataOrdinary//普通缺陷
@@ -83,8 +76,8 @@
                 stack: '总量',
                 label: {
                     normal: {
-                        show: true,
-                        position: 'insideRight'
+                        show: false,
+                        position: ''
                     }
                 },
                 data: dataSlight//轻微缺陷
@@ -94,14 +87,33 @@
     return option;
 }
 
-function simpleBar(names,dataY) {
+function simpleBar(names,dataY) {//查询bug平均关闭时间
     var option = {
         title: {
-            text: '缺陷平均关闭时间'
+            text: ''
         },
-        tooltip: {},
+        tooltip: {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        toolbox: {
+            feature: {
+                dataView: {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'tiled','stack']},
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
         legend: {
             data:['时间/h'],
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
         },
         xAxis: {
             data: names
@@ -110,58 +122,23 @@ function simpleBar(names,dataY) {
         series: [{
             name: '时间/h',
             type: 'bar',
+            label: {
+                normal: {
+                    show: true,
+                    position: 'top'
+                }
+            },
             data: dataY
         }]
     };
     return option;
 }
 
-function simplePie(){
-    var option = {
-        title : {
-            text: '某站点用户访问来源',
-            subtext: '纯属虚构',
-            x:'center'
-        },
-        tooltip : {
-            trigger: 'item',
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-        legend: {
-            orient: 'vertical',
-            left: 'left',
-            data: ['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
-        },
-        series : [
-            {
-                name: '访问来源',
-                type: 'pie',
-                radius : '55%',
-                center: ['50%', '60%'],
-                data:[
-                    {value:335, name:'直接访问'},
-                    {value:310, name:'邮件营销'},
-                    {value:234, name:'联盟广告'},
-                    {value:135, name:'视频广告'},
-                    {value:1548, name:'搜索引擎'}
-                ],
-                itemStyle: {
-                    emphasis: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
-                    }
-                }
-            }
-        ]
-    };
-    return option;
-}
 
-function stackedLine(){
+/*function stackedLine(projectNmme,dataX,dataY){//按月/天统计缺陷分布
     var option = {
         title: {
-            text: '堆叠图'
+            text: ''
         },
         tooltip : {
             trigger: 'axis',
@@ -173,11 +150,14 @@ function stackedLine(){
             }
         },
         legend: {
-            data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+            data: projectNmme,
         },
         toolbox: {
             feature: {
-                saveAsImage: {}
+                dataView: {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'tiled','stack']},
+                restore: {show: true},
+                saveAsImage: {show: true}
             }
         },
         grid: {
@@ -190,57 +170,65 @@ function stackedLine(){
             {
                 type : 'category',
                 boundaryGap : false,
-                data : ['周一','周二','周三','周四','周五','周六','周日']
+                data : dataX
             }
         ],
         yAxis : [
             {
-                type : 'value'
+                type : 'value',
             }
         ],
-        series : [
-            {
-                name:'邮件营销',
-                type:'line',
-                stack: '总量',
-                areaStyle: {},
-                data:[120, 132, 101, 134, 90, 230, 210]
-            },
-            {
-                name:'联盟广告',
-                type:'line',
-                stack: '总量',
-                areaStyle: {},
-                data:[220, 182, 191, 234, 290, 330, 310]
-            },
-            {
-                name:'视频广告',
-                type:'line',
-                stack: '总量',
-                areaStyle: {},
-                data:[150, 232, 201, 154, 190, 330, 410]
-            },
-            {
-                name:'直接访问',
-                type:'line',
-                stack: '总量',
-                areaStyle: {normal: {}},
-                data:[320, 332, 301, 334, 390, 330, 320]
-            },
-            {
-                name:'搜索引擎',
-                type:'line',
-                stack: '总量',
+        series : dataY,
+
+    };
+    return option;
+}*/
+
+function replayLine(projectNmme,dataX,dataY){//复盘缺陷
+    var option = {
+        title: {
+            text: ''
+        },
+        tooltip : {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
                 label: {
-                    normal: {
-                        show: true,
-                        position: 'top'
-                    }
-                },
-                areaStyle: {normal: {}},
-                data:[820, 932, 901, 934, 1290, 1330, 1320]
+                    backgroundColor: '#6a7985'
+                }
             }
-        ]
+        },
+        legend: {
+            data: projectNmme,
+        },
+        toolbox: {
+            feature: {
+                dataView: {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'tiled','stack']},
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                data : dataX
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value',
+            }
+        ],
+        series : dataY,
+
     };
     return option;
 }

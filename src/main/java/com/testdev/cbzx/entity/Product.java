@@ -19,6 +19,13 @@ public class Product{
 	private Date createdDate;
 	private String platform;
 	private String deleted;
+
+	//新增
+	private Integer type;//所属项目类主键
+	private String productType;//所属项目类名
+	private String address;//管理缺陷地址
+	private Integer display;//默认展示
+
 	public void setId(Integer id){
 	this.id=id;
 	}
@@ -66,6 +73,56 @@ public class Product{
 	}
 	public String getDeleted(){
 		return deleted;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getProductType() {
+		return productType;
+	}
+
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public Integer getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(Integer display) {
+		this.display = display;
+	}
+
+	@Override
+	public String toString() {
+		return "Product{" +
+				"id=" + id +
+				", pid=" + pid +
+				", name='" + name + '\'' +
+				", code='" + code + '\'' +
+				", createdBy='" + createdBy + '\'' +
+				", createdDate=" + createdDate +
+				", platform='" + platform + '\'' +
+				", deleted='" + deleted + '\'' +
+				", type=" + type +
+				", productType='" + productType + '\'' +
+				", address='" + address + '\'' +
+				", display=" + display +
+				'}';
 	}
 }
 

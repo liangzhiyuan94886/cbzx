@@ -15,48 +15,292 @@
         GROUP BY project,severity
     </select>
 
-    <!--按项目严重等级查询未关闭缺陷-->
-    <select id="getBuginfo" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+    <!--按项目严重等级查询所有缺陷-->
+    <select id="getBugInfoBySeverity" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
         SELECT
-        `name` as title,
-        severity,
-        count(*) AS count
+            p.NAME AS projectName,
+            b.severity,
+            b.count
         FROM
-        bug b,
-        product p
-        WHERE
-        p.pid = b.project
-            AND b.project = #{pid}
-            AND p.deleted =0
-            AND b.deleted =0
-            AND (ISNULL(b.closedBy) OR b.resolution != 10000)
-        GROUP BY
-        project,severity
+            ( SELECT NAME, pid FROM product WHERE pid = #{pid} ) p
+            LEFT JOIN (
+            SELECT
+                severity,
+                project,
+                count(*) AS count
+            FROM
+                bug
+            WHERE
+                project = #{pid}
+                AND ( deleted = 0 OR deleted IS NULL )
+                AND openedDate BETWEEN #{startTime} AND #{endTime}
+                AND (platform = 'zt' OR type IN (10004))
+            GROUP BY
+            severity
+            ) b ON p.pid = b.project
     </select>
 
-    <!--查询每个 缺陷关闭所需时间-->
-    <select id="getBugSpendDate" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+    <!--查询每个项目缺陷关闭所需时间(已关闭)-->
+    <select id="getBugSpendDate" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
         SELECT
-        NAME as projectName,
-        SUM(closedDate)-SUM(openedDate) AS difference,
+        p.NAME AS projectName,
+        b.difference,
+        b.bugCount
+        FROM
+        ( SELECT NAME, pid FROM product WHERE pid =  #{pid} ) p
+        LEFT JOIN (
+        SELECT
+        project,
+        IFNULL((SUM( closedDate )- SUM( openedDate )),(SUM( resolutionDate )- SUM( openedDate ))) AS difference,
         COUNT(*) AS bugCount
         FROM
-        bug b,
-        product p
+        bug
         WHERE
-        p.pid = b.project
-        <if test="_parameter != null">
-            AND b.project = #{pid}
-            AND b.closedDate IS NOT NULL
-        </if>
-        GROUP BY
-        name
+        project = #{pid}
+        AND  openedDate &gt;= #{startTime}
+        AND  (closedDate &lt;= #{endTime} OR resolutionDate &lt;= #{endTime})
+        AND (platform = 'zt' OR type IN ( 10004 ))
+        AND STATUS IN ( 'closed', 6 )
+        AND (deleted = 0 OR deleted IS NULL)
+        ) b ON p.pid = b.project
     </select>
 
     <!--查到没有缺陷的情况下，查询product的信息-->
     <select id="getProductinfo" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
-            SELECT name AS title FROM product WHERE pid = #{parseInt}
+        SELECT name AS title,name as projectName FROM product WHERE pid = #{parseInt}
     </select>
 
+    <!--统计各个项目缺陷情况表格-->
+    <select id="getBugDistribution" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        pid AS pid,
+        platform,
+        NAME AS projectName,
+        IFNULL(b.newAdd,0) AS newAdd,
+        IFNULL(b.newAddSerious,0) AS newAddSerious,
+        IFNULL(b.discovered,0) AS discovered,
+        IFNULL(b.resolved,0) AS resolved,
+        IFNULL(b.unresolved,0) AS unresolved,
+        IFNULL(b.unresolvedSerious,0) AS unresolvedSerious,
+        IFNULL(b.reopen,0) AS reopen,
+        IFNULL(b.deadlineUnresolved,0) AS deadlineUnresolved
+        FROM product
+        LEFT JOIN(
+        SELECT NAME as projectName,
+        COUNT(IF(DATE_SUB(CURDATE(),INTERVAL 7 DAY) &lt;= openedDate,TRUE,NULL)) AS newAdd,
+        COUNT(IF(DATE_SUB(CURDATE(),INTERVAL 7 DAY) &lt;= openedDate AND severity = 2,TRUE,NULL)) AS newAddSerious,
+        COUNT(*) AS discovered,
+        COUNT(IF(STATUS IN('closed',6) ,TRUE,NULL)) AS resolved,
+        COUNT(IF(STATUS NOT IN('closed',6),TRUE,NULL)) AS unresolved,
+        COUNT(IF(STATUS NOT IN('closed',6) AND severity = 2,TRUE,NULL)) AS unresolvedSerious,
+        COUNT(IF( (closedBy = '' AND reopen = 1 AND b.platform = 'zt') OR (STATUS != 6 AND reopen = 1 AND b.platform = 'jira'),TRUE,NULL)) AS reopen,
+        COUNT(IF(NOW() > IF(deadline,DATE_ADD(deadline,INTERVAL 3 day),DATE_ADD(openedDate,INTERVAL 10 day)) AND STATUS NOT IN('closed',6),TRUE,NULL)) AS deadlineUnresolved
+        FROM product p, bug b
+        WHERE p.pid = b.project
+        AND (b.platform = 'zt' OR b.type IN (10004))
+        AND (b.deleted = 0 OR b.deleted IS NULL)
+		AND p.deleted = 0
+        GROUP BY NAME)b ON NAME = b.projectName
+        WHERE deleted = 0
+        AND platform IS NOT NULL
+    </select>
+
+    <!--按时间段查询缺陷数量分布——按月-->
+    <select id="getBugDistributionByMonth" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+            NAME AS projectName,
+            result.month,
+            result.count,
+            result.unresolved
+        FROM
+            ( SELECT pid, NAME FROM product WHERE pid = #{pid} ) p
+            LEFT JOIN (
+            SELECT
+                b.projectName,
+                m.MONTH,
+                IFNULL( b.count, 0 ) AS count,
+                IFNULL(b.unresolved,0) AS unresolved
+            FROM
+                ( SELECT DATE_FORMAT(month, '%Y-%m' ) as month
+                        FROM date
+						WHERE DATE_FORMAT(month, '%Y-%m' ) BETWEEN DATE_FORMAT(#{startTime} , '%Y-%m' ) AND DATE_FORMAT(#{endTime} , '%Y-%m' )
+								) m
+                LEFT JOIN (
+                SELECT
+                    NAME AS projectName,
+                    DATE_FORMAT( openedDate, '%Y-%m' ) AS MONTH,
+                    COUNT(*) AS count,
+                    COUNT(IF(status NOT IN('closed',6),TRUE,NULL )) AS unresolved
+                FROM
+                    bug b,
+                    product p
+                WHERE
+                    DATE_FORMAT( b.openedDate, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
+                    AND p.pid = b.project
+                    AND p.pid = #{pid}
+                    AND (b.platform = 'zt' OR b.type IN (10004))
+                    AND (b.deleted = 0 OR b.deleted IS NULL)
+                GROUP BY NAME, MONTH
+                ) b ON m.MONTH = b.MONTH
+            ) result ON p.pid = #{pid}
+    </select>
+
+
+    <!--按时间段查询缺陷数量分布——按天-->
+    <select id="getBugDistributionByDay" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT 
+			NAME AS projectName,
+			result.day,
+			result.count,
+			result.unresolved 
+		FROM
+			product
+			LEFT JOIN (
+			SELECT
+				d.day,
+				IFNULL( b.count, 0 ) AS count,
+				IFNULL( b.unresolved, 0 ) AS unresolved 
+			FROM
+				(
+				SELECT
+					DATE_FORMAT( DAY, '%m-%d' ) AS day 
+				FROM
+					date 
+				WHERE
+					DATE_FORMAT( DAY, '%m-%d' ) BETWEEN DATE_FORMAT(#{startTime}, '%m-%d' ) AND DATE_FORMAT( #{endTime}, '%m-%d' )) d
+				LEFT JOIN (
+				SELECT
+					DATE_FORMAT( openedDate, '%m-%d' ) AS day,
+					COUNT(*) AS count,
+					COUNT(IF(status NOT IN('closed',6),TRUE,NULL )) AS unresolved 
+				FROM
+					bug 
+				WHERE
+					DATE_FORMAT( openedDate, '%Y-%m-%d' ) BETWEEN #{startTime} AND #{endTime}
+					AND project = #{pid}
+					AND (platform = 'zt' OR type IN (10004))
+					AND (deleted = 0 OR deleted IS NULL)
+				GROUP BY DAY 
+				) b ON d.DAY = b.DAY 
+			) result ON pid = #{pid}
+		WHERE pid = #{pid}
+    </select>
+
+    <!--查询对应项目未关闭严重bug-->
+    <select id="getUnresolvedSeriousBug" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+            *
+        FROM
+            bug
+        WHERE
+            project = #{project}
+            AND severity = 2
+            AND STATUS NOT IN ( 'closed', 6 )
+            AND (deleted = 0 OR deleted IS NULL)
+            AND (platform = 'zt' OR type IN (10004))
+    </select>
+
+<!--    &lt;!&ndash;查询未解决缺陷复盘&ndash;&gt;
+    <select id="getUnresolvedBugReplay" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        <foreach item="item" index="index" collection="dateList"  open="" separator="," close="">
+        COUNT(IF((openedDate &lt;= #{item}
+        AND (closedDate &gt; #{item}
+        OR closedDate IS NULL)) ,TRUE,NULL)) AS count
+        </foreach>
+        FROM bug WHERE project = ${pid}
+        AND (deleted = 0 OR deleted IS NULL)
+        AND (platform = 'zt' OR TYPE IN (10004))
+        AND openedDate &gt;= #{startTime}
+        AND openedDate &lt;= #{endTime}
+    </select>-->
+
+    <!--查询未解决缺陷复盘-->
+    <select id="getUnresolvedBugReplay" parameterType="com.testdev.cbzx.entity.PoVo" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        (SELECT NAME FROM product WHERE pid = #{pid}) AS projectName,
+            COUNT(IF((openedDate &lt;= #{date}
+            AND (closedDate &gt; #{date}
+            OR closedDate IS NULL)) ,TRUE,NULL)) AS count
+        FROM bug WHERE project = #{pid}
+        AND (deleted = 0 OR deleted IS NULL)
+        AND (platform = 'zt' OR TYPE IN (10004))
+        AND openedDate &gt;= #{startTime}
+        AND openedDate &lt;= #{endTime}
+    </select>
+
+    <!--按分类查缺陷周报表格-->
+    <select id="getBugDistributionByType" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+        pid AS pid,
+        platform,
+        NAME AS projectName,
+        IFNULL(b.newAdd,0) AS newAdd,
+        IFNULL(b.newAddSerious,0) AS newAddSerious,
+        IFNULL(b.discovered,0) AS discovered,
+        IFNULL(b.resolved,0) AS resolved,
+        IFNULL(b.unresolved,0) AS unresolved,
+        IFNULL(b.unresolvedSerious,0) AS unresolvedSerious,
+        IFNULL(b.reopen,0) AS reopen,
+        IFNULL(b.deadlineUnresolved,0) AS deadlineUnresolved
+        FROM product
+        LEFT JOIN(
+        SELECT NAME as projectName,
+        COUNT(IF(DATE_SUB(CURDATE(),INTERVAL 7 DAY) &lt;= openedDate,TRUE,NULL)) AS newAdd,
+        COUNT(IF(DATE_SUB(CURDATE(),INTERVAL 7 DAY) &lt;= openedDate AND severity = 2,TRUE,NULL)) AS newAddSerious,
+        COUNT(*) AS discovered,
+        COUNT(IF(STATUS IN('closed',6) ,TRUE,NULL)) AS resolved,
+        COUNT(IF(STATUS NOT IN('closed',6),TRUE,NULL)) AS unresolved,
+        COUNT(IF(STATUS NOT IN('closed',6) AND severity = 2,TRUE,NULL)) AS unresolvedSerious,
+        COUNT(IF( (closedBy = '' AND reopen = 1 AND b.platform = 'zt') OR (STATUS != 6 AND reopen = 1 AND b.platform = 'jira'),TRUE,NULL)) AS reopen,
+        COUNT(IF(NOW() > IF(deadline,DATE_ADD(deadline,INTERVAL 3 day),DATE_ADD(openedDate,INTERVAL 10 day)) AND STATUS NOT IN('closed',6),TRUE,NULL)) AS deadlineUnresolved
+        FROM product p, bug b
+        WHERE p.pid = b.project
+        AND (b.platform = 'zt' OR b.type IN (10004))
+        AND (b.deleted = 0 OR b.deleted IS NULL)
+        GROUP BY NAME)b ON NAME = b.projectName
+        WHERE deleted = 0
+        AND type = #{type}
+        AND platform IS NOT NULL
+    </select>
+
+    <!--查询对应项目到期未关闭bug-->
+    <select id="getDeadlineUnresolvedBug" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT
+            *
+        FROM
+            bug
+        WHERE
+            project = #{project}
+            AND STATUS NOT IN ( 'closed', 6 )
+            AND (deleted = 0 OR deleted IS NULL)
+            AND (platform = 'zt' OR type IN ( 10004 ))
+            AND (NOW() > IF(deadline,DATE_ADD(deadline,INTERVAL 3 day),DATE_ADD(openedDate,INTERVAL 10 day)))
+    </select>
+
+    <!--查询手动添加的缺陷周报表格-->
+    <select id="getOtherBugDistribution" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT *  FROM issues
+    </select>
+
+    <!--按分类查询手动添加的缺陷周报表格-->
+    <select id="getOtherBugDistributionByType" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Bug">
+        SELECT * FROM issues WHERE uid IN(SELECT pid FROM product WHERE type = #{type})
+    </select>
+
+    <!--编辑缺陷周报-->
+    <select id="updateIssuesWeekly" parameterType="com.testdev.cbzx.entity.Issues" resultType="com.testdev.cbzx.entity.Issues">
+        UPDATE issues
+        SET newAdd = #{newAdd},
+        newAddSerious = #{newAddSerious},
+        discovered = #{discovered},
+        resolved = #{resolved},
+        unresolved = #{unresolved},
+        deadlineUnresolved = #{deadlineUnresolved},
+        reopen = #{reopen},
+        unresolvedSerious = #{unresolvedSerious}
+        WHERE
+            id = #{id}
+    </select>
 
 </mapper>

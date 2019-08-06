@@ -1,0 +1,1 @@
+ALTER TABLE `bug` ADD `deadline` DATETIME NULL DEFAULT NULL COMMENT '截止日期' AFTER `resolutionDate`;

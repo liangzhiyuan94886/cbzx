@@ -1,7 +1,5 @@
 package com.testdev.cbzx.entity;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.Date;
 
 /**
@@ -36,13 +34,62 @@ public class Bug{
 
 
 	/* 新增字段 */
-	private Long difference; // 差值
+	private Boolean isNotHaveData;//判断echart中是否有数据。
+	private Long difference; // 缺陷关闭所需时间
 	private String projectName; // 項目名稱
-	private Long bugCount; // 缺陷數值
+	private Long bugCount; // 缺陷数量（时间/数量,需要long型）
+	private Double average;//平均关闭时间
+	private Integer newAdd;//本周新增缺陷数量
+	private  Integer newAddSerious;//本周新增严重缺陷数量
+	private Integer discovered;//已发现缺陷数量
+	private  Integer resolved;//已解决缺陷数量
+	private  Integer unresolved;//未解决缺陷数量
+	private  Integer unresolvedSerious;//未解决严重缺陷数量
+	private String month;//月份
+	private  String week;//周
+	private  String day;//天
+	private  Integer reopen;//重新打开
+	private Date deadline;//截至日期
+	private Integer deadlineUnresolved;//到期未解决数量
+	private Date updateDate;
+
+
+	public String getMonth() {
+		return month;
+	}
+
+	public void setMonth(String month) {
+		this.month = month;
+	}
+
+	public String getWeek() {
+		return week;
+	}
+
+	public void setWeek(String week) {
+		this.week = week;
+	}
+
+	public String getDay() {
+		return day;
+	}
+
+	public void setDay(String day) {
+		this.day = day;
+	}
 
 	public Long getBugCount() {
 		return bugCount;
 	}
+
+	public Double getAverage() {
+		return average;
+	}
+
+	public void setAverage(Double average) {
+		this.average = average;
+	}
+
 	public void setBugCount(Long bugCount) {
 		this.bugCount = bugCount;
 	}
@@ -59,11 +106,53 @@ public class Bug{
         this.difference = difference;
     }
 
+	public Integer getNewAdd() {
+		return newAdd;
+	}
 
+	public void setNewAdd(Integer newAdd) {
+		this.newAdd = newAdd;
+	}
 
+	public Integer getNewAddSerious() {
+		return newAddSerious;
+	}
 
+	public void setNewAddSerious(Integer newAddSerious) {
+		this.newAddSerious = newAddSerious;
+	}
 
-    private Boolean isNotHaveData;//echart中是否有数据。
+	public Integer getDiscovered() {
+		return discovered;
+	}
+
+	public void setDiscovered(Integer discovered) {
+		this.discovered = discovered;
+	}
+
+	public Integer getResolved() {
+		return resolved;
+	}
+
+	public void setResolved(Integer resolved) {
+		this.resolved = resolved;
+	}
+
+	public Integer getUnresolved() {
+		return unresolved;
+	}
+
+	public void setUnresolved(Integer unresolved) {
+		this.unresolved = unresolved;
+	}
+
+	public Integer getUnresolvedSerious() {
+		return unresolvedSerious;
+	}
+
+	public void setUnresolvedSerious(Integer unresolvedSerious) {
+		this.unresolvedSerious = unresolvedSerious;
+	}
 
 	public Boolean getNotHaveData() {
 		return isNotHaveData;
@@ -183,5 +272,80 @@ public class Bug{
     public void setCount(Integer count) {
         this.count = count;
     }
+
+	public Integer getReopen() {
+		return reopen;
+	}
+
+	public void setReopen(Integer reopen) {
+		this.reopen = reopen;
+	}
+
+	public Date getDeadline() {
+		return deadline;
+	}
+
+	public void setDeadline(Date deadline) {
+		this.deadline = deadline;
+	}
+
+	public Integer getDeadlineUnresolved() {
+		return deadlineUnresolved;
+	}
+
+	public void setDeadlineUnresolved(Integer deadlineUnresolved) {
+		this.deadlineUnresolved = deadlineUnresolved;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Bug{" +
+				"id=" + id +
+				", pid=" + pid +
+				", project=" + project +
+				", title='" + title + '\'' +
+				", type='" + type + '\'' +
+				", severity='" + severity + '\'' +
+				", steps='" + steps + '\'' +
+				", status='" + status + '\'' +
+				", openedBy='" + openedBy + '\'' +
+				", openedDate=" + openedDate +
+				", assignedTo='" + assignedTo + '\'' +
+				", closedBy='" + closedBy + '\'' +
+				", closedDate=" + closedDate +
+				", resolution='" + resolution + '\'' +
+				", resolutionDate=" + resolutionDate +
+				", deleted='" + deleted + '\'' +
+				", platform='" + platform + '\'' +
+				", count=" + count +
+				", isNotHaveData=" + isNotHaveData +
+				", difference=" + difference +
+				", projectName='" + projectName + '\'' +
+				", bugCount=" + bugCount +
+				", average=" + average +
+				", newAdd=" + newAdd +
+				", newAddSerious=" + newAddSerious +
+				", discovered=" + discovered +
+				", resolved=" + resolved +
+				", unresolved=" + unresolved +
+				", unresolvedSerious=" + unresolvedSerious +
+				", month='" + month + '\'' +
+				", week='" + week + '\'' +
+				", day='" + day + '\'' +
+				", reopen=" + reopen +
+				", deadline=" + deadline +
+				", deadlineUnresolved=" + deadlineUnresolved +
+				", updateDate=" + updateDate +
+				'}';
+	}
+
 }
 

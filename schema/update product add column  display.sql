@@ -1,0 +1,1 @@
+ALTER TABLE `cbzx`.`product` ADD COLUMN `display` int(10) NULL DEFAULT 0 COMMENT '是否默认展示' AFTER `address`;

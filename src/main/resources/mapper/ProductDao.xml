@@ -15,4 +15,15 @@
     <select id="getProduct" resultMap="ProductResultMap">
         select pid,name from product where deleted = 0
     </select>
+
+    <!--根据项目主键查询缺陷地址-->
+    <select id="getBugAddressByProject" resultType="com.testdev.cbzx.entity.Product">
+        SELECT IFNULL(address,'') AS address FROM product WHERE pid = #{project}
+    </select>
+
+    <!--查默认展示项目-->
+    <select id="getDefaultDisplay" resultType="java.lang.Integer">
+        SELECT pid FROM product WHERE display = 1
+    </select>
+
 </mapper>
