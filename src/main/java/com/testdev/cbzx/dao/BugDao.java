@@ -25,7 +25,7 @@ public interface BugDao {
     List<Bug> getProductinfo(int parseInt);
 
     //查询全部bug信息（已发现。。）
-    List<Bug> getBugDistribution();
+    List<Bug> getBugDistribution(String typeId, String statusId, Integer days);
 
     //按时间段查缺陷数量-按月
     List<Bug> getBugDistributionByMonth(PoVo poVo);
@@ -37,16 +37,13 @@ public interface BugDao {
     List<Bug> getBugDistributionByDay(PoVo poVo);
 
     //查询对应项目的未关闭严重缺陷
-    List<Bug> getUnresolvedSeriousBug(Integer project);
+    List<Bug> getUnresolvedSeriousBug(Integer project, Integer days);
 
     //查询未解决缺陷复盘
     List<Bug> getUnresolvedBugReplay(PoVo poVo);
 
-    //按分类查缺陷表格
-    List<Bug> getBugDistributionByType(Integer type);
-
     //查询对应项目到期未关闭缺陷
-    List<Bug> getDeadlineUnresolvedBug(Integer project);
+    List<Bug> getDeadlineUnresolvedBug(Integer project, Integer days);
 
     //查询手动添加的缺陷周报表格
     List<Bug> getOtherBugDistribution();
@@ -56,4 +53,7 @@ public interface BugDao {
 
     //编辑缺陷周报
     Issues updateIssuesWeekly(Issues issues);
+
+    //缺陷及时性
+    List<Bug> getBugTimeliness(PoVo poVo);
 }

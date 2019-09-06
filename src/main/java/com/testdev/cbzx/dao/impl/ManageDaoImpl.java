@@ -20,12 +20,9 @@ public class ManageDaoImpl implements ManageDao {
     }
 
     @Override
-    public List<Product> getProduct() {
-        return manageDao.getProduct();
+    public List<Product> getProduct(String typeId, String statusId) {
+        return manageDao.getProduct(typeId, statusId);
     }
-
-    @Override
-    public  List<Product> getProductById(Integer id) {return  manageDao.getProductById(id);}
 
     //更新 不更新分类type
     @Override

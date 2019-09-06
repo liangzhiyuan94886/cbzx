@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class Bug{
 	private Integer id;
-	private Integer pid;
+	private String pid;
 	private Integer project;
 	private String title;
 	private String type;
@@ -168,10 +168,10 @@ public class Bug{
 	public Integer getId(){
 		return id;
 	}
-	public void setPid(Integer pid){
+	public void setPid(String pid){
 	this.pid=pid;
 	}
-	public Integer getPid(){
+	public String getPid(){
 		return pid;
 	}
 	public void setProject(Integer project){
@@ -309,7 +309,7 @@ public class Bug{
 	public String toString() {
 		return "Bug{" +
 				"id=" + id +
-				", pid=" + pid +
+				", pid='" + pid + '\'' +
 				", project=" + project +
 				", title='" + title + '\'' +
 				", type='" + type + '\'' +

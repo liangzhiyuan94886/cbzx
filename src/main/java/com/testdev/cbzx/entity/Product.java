@@ -25,6 +25,8 @@ public class Product{
 	private String productType;//所属项目类名
 	private String address;//管理缺陷地址
 	private Integer display;//默认展示
+	private String pstatus;//项目状态
+	private String statusname;//状态名称
 
 	public void setId(Integer id){
 	this.id=id;
@@ -75,6 +77,22 @@ public class Product{
 		return deleted;
 	}
 
+	public String getPstatus() {
+		return pstatus;
+	}
+
+	public void setPstatus(String pstatus) {
+		this.pstatus = pstatus;
+	}
+
+	public String getStatusname() {
+		return statusname;
+	}
+
+	public void setStatusname(String statusname) {
+		this.statusname = statusname;
+	}
+
 	public Integer getType() {
 		return type;
 	}
@@ -122,6 +140,8 @@ public class Product{
 				", productType='" + productType + '\'' +
 				", address='" + address + '\'' +
 				", display=" + display +
+				", pstatus='" + pstatus + '\'' +
+				", statusname='" + statusname + '\'' +
 				'}';
 	}
 }

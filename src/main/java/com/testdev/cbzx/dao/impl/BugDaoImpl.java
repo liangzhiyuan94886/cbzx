@@ -70,7 +70,9 @@ public class BugDaoImpl implements BugDao {
      * @return
      */
     @Override
-    public List<Bug> getBugDistribution(){ return bugDao.getBugDistribution(); }
+    public List<Bug> getBugDistribution(String typeId, String statusId, Integer days){
+        return bugDao.getBugDistribution(typeId, statusId, days);
+    }
 
     /**
      * 按时间段、pid查各项目产生的缺陷数量（曲线图）
@@ -90,7 +92,7 @@ public class BugDaoImpl implements BugDao {
      * @return
      */
     @Override
-    public  List<Bug> getUnresolvedSeriousBug(Integer project) {return  bugDao.getUnresolvedSeriousBug(project);}
+    public  List<Bug> getUnresolvedSeriousBug(Integer project, Integer days) {return  bugDao.getUnresolvedSeriousBug(project, days);}
 
     /**
      * 查询未解决缺陷复盘
@@ -103,23 +105,13 @@ public class BugDaoImpl implements BugDao {
     }
 
     /**
-     * 按分类查缺陷表格
-     * @param type
-     * @return
-     */
-    @Override
-    public List<Bug> getBugDistributionByType(Integer type) {
-        return bugDao.getBugDistributionByType(type);
-    }
-
-    /**
      * 查询对应项目到期未关闭缺陷
      * @param project
      * @return
      */
     @Override
-    public List<Bug> getDeadlineUnresolvedBug(Integer project) {
-        return bugDao.getDeadlineUnresolvedBug(project);
+    public List<Bug> getDeadlineUnresolvedBug(Integer project, Integer days) {
+        return bugDao.getDeadlineUnresolvedBug(project, days);
     }
 
     /**
@@ -150,6 +142,16 @@ public class BugDaoImpl implements BugDao {
     @Override
     public Issues updateIssuesWeekly(Issues issues) {
         return bugDao.updateIssuesWeekly(issues);
+    }
+
+    /**
+     * 缺陷及时性统计
+     * @param poVo
+     * @return
+     */
+    @Override
+    public List<Bug> getBugTimeliness(PoVo poVo) {
+        return bugDao.getBugTimeliness(poVo);
     }
 
 

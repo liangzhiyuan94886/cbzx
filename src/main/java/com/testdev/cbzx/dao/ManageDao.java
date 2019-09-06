@@ -11,11 +11,7 @@ public interface ManageDao {
     List<ProductType> getProductType();
 
     //查询全部项目
-    List<Product> getProduct();
-
-    //根据类型id查询对应类型项目
-    List<Product> getProductById(Integer id);
-
+    List<Product> getProduct(String typeId, String statusId);
 
     //更新 不更新分类type
     Product updateByPidNoType(Product product);

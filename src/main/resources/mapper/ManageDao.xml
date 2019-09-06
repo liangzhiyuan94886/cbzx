@@ -15,29 +15,17 @@
             t.productType,
             address,
             display,
-            type
+            type,
+            pstatus,
+            ps.status AS statusname
         FROM
             product p
             LEFT JOIN ( SELECT * FROM product_type ) t ON p.type = t.id
+            LEFT JOIN ( SELECT * FROM product_status) ps ON p.`pstatus` = ps.id
         WHERE
             p.deleted = 0
-    </select>
-
-    <!--根据类型id查询某类型项目-->
-    <select id="getProductById" parameterType="java.lang.Integer" resultType="com.testdev.cbzx.entity.Product">
-        SELECT
-            pid,
-            NAME,
-            productType,
-            address,
-            display,
-            type
-        FROM
-            product p,
-            (SELECT productType FROM product_type WHERE id = #{id}) t
-        WHERE
-            type = #{id}
-            AND deleted = 0
+        <if test="typeId != null">AND type = #{typeId}</if>
+        <if test="statusId != null">AND pstatus = #{statusId}</if>
     </select>
 
     <!--更新地址 不更新分类-->
@@ -47,7 +35,15 @@
 
     <!--更新分类和地址 -->
     <select id="updateByPid"  resultType="com.testdev.cbzx.entity.Product">
-        UPDATE product SET type = #{type}, address = #{address}, display = #{display} WHERE pid = #{pid}
+        UPDATE product SET
+        type = #{type},
+        address = #{address},
+        <if test="display == null">display = 0,</if>
+        <if test="display != null">display = #{display},</if>
+        <if test="pstatus == ''">pstatus = null,</if>
+        <if test="pstatus != ''">pstatus = #{pstatus},</if>
+        name = #{name}
+        WHERE pid = #{pid}
     </select>
 
     <!--删除分类 -->

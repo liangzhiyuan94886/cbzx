@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.testdev.cbzx.dao.ProductStatusDao">
+
+    <select id="addProductStatus">
+        INSERT INTO product_status (status) VALUES (#{status})
+    </select>
+
+    <select id="updateProductStatus">
+        UPDATE product_status SET status = #{status} WHERE id = #{id}
+    </select>
+
+    <select id="deleteProductStatus">
+        DELETE FROM product_status WHERE id = #{id}
+    </select>
+
+    <!--查询项目类型-->
+    <select id="getProductStatus" resultType="com.testdev.cbzx.entity.ProductStatus">
+        SELECT id, status FROM product_status
+    </select>
+
+</mapper>

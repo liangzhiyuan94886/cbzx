@@ -348,8 +348,8 @@ a cite{font-style: normal; *cursor:pointer;}
   .layui-col-md-offset12{margin-left: 100%;}
 }
 /* 大型屏幕(桌面) */
-@media screen and (min-width: 1200px) {
-  .layui-container{width: 1170px;}
+@media screen and (min-width: 1280px) {
+  .layui-container{width: 1250px;}
   .layui-hide-lg{display: none!important;}
   .layui-show-lg-block{display: block!important;}
   .layui-show-lg-inline{display: inline!important;}

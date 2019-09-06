@@ -14,52 +14,26 @@
 </head>
 <body>
 
-<div class='card-holder'>
-    <div class='card-wrapper'>
-        <a href='#f1' class="card-a">
-            <div class='card bg-01'>
-                <span class='card-content'>缺陷平均关闭时间</span>
-            </div>
-        </a>
-    </div>
-    <div class='card-wrapper'>
-        <a href='#f2' class="card-a">
-            <div class='card bg-02'>
-                <span class='card-content'>缺陷等级分布</span>
-            </div>
-        </a>
-    </div>
-    <div class='card-wrapper'>
-        <a href='#f3' class="card-a">
-            <div class='card bg-03'>
-                <span class='card-content'>缺陷燃尽图</span>
-            </div>
-        </a>
-    </div>
-    <div class='card-wrapper'>
-        <a href='#f4' class="card-a">
-            <div class='card bg-04'>
-                <span class='card-content'>缺陷表格</span>
-            </div>
-        </a>
-    </div>
-    <#--<div class='card-wrapper'>
-        <a href='#' class="card-a">
-            <div class='card bg-05'>
-                <span class='card-content'>区域5</span>
-            </div>
-        </a>
-    </div>
-    <div class='card-wrapper'>
-        <a href='#' class="card-a">
-            <div class='card bg-06'>
-                <span class='card-content'>区域6</span>
-            </div>
-        </a>
-    </div>-->
-</div>
-
-<a href="/manage" class="layui-btn" target="_blank" style="float: right">项目分类</a>
+<ul class="layui-nav layui-nav-tree layui-inline" lay-filter="nav_demo" style="position: fixed;width: 8%;margin-top: 100px">
+    <li class="layui-nav-item layui-nav-itemed">
+        <a href="#f1">缺陷统计表格</a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="#f2">平均关闭时间</a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="#f3">缺陷等级分布</a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="#f4">缺陷燃尽图</a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="/manage" target="_blank">项目管理</a>
+    </li>
+    <li class="layui-nav-item">
+        <a href="#">TOP</a>
+    </li>
+</ul>
 
 <div class="layui-container">
     <div class="layui-col-lg12 layui-col-md12">
@@ -70,13 +44,20 @@
                         <#--<label class="layui-form-label">复选框</label>-->
 
                         <div class="layui-inline">
-                            <label class="layui-form-label">产品类型</label>
+                            <label class="layui-form-label">产品选项</label>
                             <div class="layui-input-inline">
-
-                                <select name="modules" id="" lay-search="" lay-filter="select1">
-                                    <option value="">请点击或搜索选择——</option>
+                                <select name="modules" id="productType" lay-search="" lay-filter="select1">
+                                    <option value="">产品领域——</option>
                                     <#list productType as p>
                                         <option value= ${p.id} > ${p.productType} </option>
+                                    </#list>
+                                </select>
+                            </div>
+                            <div class="layui-input-inline">
+                                <select name="productStatus" id="productStatus" lay-search="" lay-filter="select1">
+                                    <option value="">产品状态——</option>
+                                    <#list productStatus as ps>
+                                        <option value= ${ps.id} > ${ps.status} </option>
                                     </#list>
                                 </select>
                             </div>
@@ -110,6 +91,16 @@
     </div>
 
     <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f1">
+        <legend>缺陷统计表格(默认时间:周)</legend>
+    </fieldset>
+
+    <div class="layui-row layui-col-space1">
+        <div class="layui-col-md12">
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+        </div>
+    </div>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f2">
         <legend>缺陷平均关闭时间</legend>
     </fieldset>
 
@@ -121,7 +112,7 @@
         </div>
     </div>
 
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f2">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f3">
         <legend>缺陷等级分布</legend>
     </fieldset>
 
@@ -133,20 +124,7 @@
         </div>
     </div>
 
-<#--    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f3">
-        <legend>缺陷燃尽图</legend>
-    </fieldset>
-
-    <div class="layui-row layui-col-space1">
-        <div class="layui-col-md12">
-            <div class="grid-demo">
-                <div id="Chart4" style="width:1200px;height:400px;"></div>
-            </div>
-        </div>
-    </div>-->
-
-
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f3">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f4">
         <legend>缺陷燃尽图</legend>
     </fieldset>
 
@@ -158,27 +136,14 @@
         </div>
     </div>
 
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f4">
-        <legend>缺陷周报表格</legend>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;" id="f5">
+        <legend>关闭及时性</legend>
     </fieldset>
-    <form class="layui-form" action="" lay-filter="example">
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">产品类型</label>
-                <div class="layui-input-inline">
-                    <select name="modules" id="" lay-search="" lay-filter="select2">
-                        <option value="">请点击或搜索选择——</option>
-                        <#list productType as p>
-                            <option value= ${p.id} > ${p.productType} </option>
-                        </#list>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </form>
     <div class="layui-row layui-col-space1">
         <div class="layui-col-md12">
-            <table class="layui-hide" id="test" lay-filter="test"></table>
+            <div class="grid-demo">
+                <div id="Chart4" style="width:1200px;height:400px;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -243,6 +208,7 @@
     </form>
 </div>
 <script src="${request.contextPath}/static/layui/layui.js" charset="utf-8"></script>
+
 <script type="text/javascript">
     layui.use(['form', 'layedit', 'laydate','table'], function(){
         var form = layui.form,
@@ -258,23 +224,24 @@
         });
 
         var table = layui.table;
-        // 初始化缺陷周报表格
+        // 初始化缺陷统计表格
         table.render({
             elem: '#test',
             url: '/getBugDistribution', //替换成返回json的接口，下面的json可以去掉
+            where: {type: '', days: 7},
             toolbar: true
             ,title: '缺陷周报表'
             ,totalRow: true
             ,cols: [[//具体参数参考：https://www.layui.com/demo/table/data.html
                 {field:'projectName', title:'项目', width:205, fixed: 'left', unresize: true, sort: true}
-                ,{field:'newAdd', title:'本周新增缺陷', width:120}
-                ,{field:'newAddSerious', title:'本周新增严重缺陷', width:145}
-                ,{field:'discovered', title:'已发现缺陷', width:120}
-                ,{field:'reopen', title:'重新打开缺陷', width:120}
-                ,{field:'resolved', title:'已关闭缺陷', width:120}
-                ,{field:'unresolved', title:'未关闭缺陷', width:120}
-                ,{field:'deadlineUnresolved', title:'到期未解决缺陷', width:135, style:'cursor: pointer;', event: 'deadlineSign'}
-                ,{field:'unresolvedSerious', title:'未关闭严重缺陷', width:135, style:'cursor: pointer;', event: 'seriousSign'}
+                ,{field:'newAdd', title:'新增缺陷', width:110, sort: true, totalRow: true}
+                ,{field:'newAddSerious', title:'新增严重缺陷', width:140, sort: true, totalRow: true}
+                ,{field:'discovered', title:'已发现缺陷', width:110, sort: true, totalRow: true}
+                ,{field:'resolved', title:'已关闭缺陷', width:110, sort: true, totalRow: true}
+                ,{field:'unresolved', title:'未关闭缺陷', width:110, sort: true, totalRow: true}
+                ,{field:'reopen', title:'重新打开缺陷', width:135, sort: true, totalRow: true}
+                ,{field:'deadlineUnresolved', title:'到期未解决缺陷', width:145, style:'cursor: pointer;', event: 'deadlineSign', sort: true,  templet: '#Tpl1', totalRow: true}
+                ,{field:'unresolvedSerious', title:'未关闭严重缺陷', width:145, style:'cursor: pointer;', event: 'seriousSign', sort: true,  templet: '#Tpl2', totalRow: true}
             ]]
             ,page: true,
             limit:10
@@ -306,7 +273,7 @@
                 $("input[name='unresolvedSerious']").val(obj.data.unresolvedSerious);
                 var index = layer.open({
                     type: 1,
-                    title: obj.data.projectName+"————"+"上次更新时间："+obj.data.updateDate,
+                    title: obj.data.projectName+"————"+"上次更新时间："+ layui.util.toDateString(obj.data.updateDate, 'yyyy-MM-dd HH:mm:ss'),
                     content: $("#table3"),
                     area: ['80%', '400px'],
                     maxmin: true
@@ -320,20 +287,28 @@
                 var url = 'getUnresolvedSeriousBug';
                 var title = '未解决严重缺陷';
             }
+
+            //更新表格
+            var startTime = $("#date1").val();
+            var endTime = $("#date2").val();
+            var days = 7;
+            if (startTime != '' && endTime != '') {
+                days = getDays(startTime, endTime);
+            }
+
             table.render({
                 elem: '#serious',
                 url: url,
-                where: {project: project},
+                where: {project: project, days: days},
                 toolbar: true,
                 title: title,
                 totalRow: true,
                 cols: [[
-                    {field:'pid', title:'ID', width:70, fixed: 'left', unresize: true, sort: true,},
-                    {field:'title', title:'缺陷标题', width:300, event: 'setSign', style:'cursor: pointer;'},//添加触发标志
-                    {field:'steps', title:'缺陷描述', width:430},
-                    {field:'openedDate', title:'创建时间', width:150},
-                    {field:'openedBy', title:'测试负责人', width:150},
-                    {field:'assignedTo', title:'指派给', width:150},
+                    {field:'pid', title:'ID', width:100, fixed: 'left', unresize: true, sort: true,},
+                    {field:'title', title:'缺陷标题', width:800, event: 'setSign', style:'cursor: pointer;', templet: '#Tpl3'},//添加触发标志
+                    {field:'openedDate', title:'创建时间', width:180, templet: "<span>{{layui.util.toDateString(d.openedDate, 'yyyy-MM-dd HH:mm:ss')}}</span>"},
+                    {field:'openedBy', title:'测试负责人', width:140},
+                    {field:'assignedTo', title:'指派给', width:140},
                     {field:'platform', title:'平台来源', width:100},
                 ]],
                 page: true,
@@ -364,8 +339,6 @@
             table.on('tool(serious)', function(obj){
                 var pid = obj.data.pid;//缺陷id
                 var project = obj.data.project;//项目主键
-                var platform = obj.data.platform;
-                var title = obj.data.title;
                 $.ajax({
                     type : "post",
                     dataType : "json",
@@ -378,26 +351,23 @@
                         if (url == "") {
                             layer.msg("请先设置缺陷管理地址！");
                         }else {
-                            if (platform == "zt") {
-                                window.open(url + pid);
-                            }else if(platform == "jira") {
-                                window.open(url + title);
-                            }else {
-                                layer.msg("这个还没集成！");
-                            }
+                            window.open(url + pid);
                         }
                     },
                 });
             });
         });
-        //选择项目类触发事件
+
+        //选择项目类触发事件,按分类展示表格
         form.on('select(select1)',function(data){
-            var id = data.value;
+            var typeId = $("#productType").val();
+            var statusId = $("#productStatus").val();
             $.ajax({//查询对应类型的项目
                 type : "post",
                 dataType : "json",
                 data:{
-                    id: id
+                    typeId: typeId,
+                    statusId: statusId
                 },
                 url : "/getProductByType",
                 success : function(data) {
@@ -409,27 +379,34 @@
                     form.render();//重新渲染
                 }
             });
+            //更新表格
+            var startTime = $("#date1").val();
+            var endTime = $("#date2").val();
+            var days = 7;
+            if (startTime != '' && endTime != '') {
+                days = getDays(startTime, endTime);
+            }
+            updateTable(typeId, statusId, days);
         });
-        //选择项目类触发事件,按分类展示表格
-        form.on('select(select2)',function(data){
-            var id = data.value;
+
+        function updateTable(typeId, statusId, days){
             table.render({
                 elem: '#test',
                 url: '/getBugDistribution',
-                where: {type: id},
+                where: {typeId: typeId, statusId: statusId, days: days},
                 toolbar: true
                 ,title: '缺陷周报表'
                 ,totalRow: true
                 ,cols: [[
                     {field:'projectName', title:'项目', width:205, fixed: 'left', unresize: true, sort: true}
-                    ,{field:'newAdd', title:'本周新增缺陷', width:120}
-                    ,{field:'newAddSerious', title:'本周新增严重缺陷', width:145}
-                    ,{field:'discovered', title:'已发现缺陷', width:120}
-                    ,{field:'reopen', title:'重新打开缺陷', width:120}
-                    ,{field:'resolved', title:'已关闭缺陷', width:120}
-                    ,{field:'unresolved', title:'未关闭缺陷', width:120}
-                    ,{field:'deadlineUnresolved', title:'到期未关闭缺陷', width:135, style:'cursor: pointer;', event: 'deadlineSign'}
-                    ,{field:'unresolvedSerious', title:'未关闭严重缺陷', width:135, style:'cursor: pointer;', event: 'seriousSign'}
+                    ,{field:'newAdd', title:'新增缺陷', width:110, sort: true, totalRow: true}
+                    ,{field:'newAddSerious', title:'新增严重缺陷', width:140, sort: true, totalRow: true}
+                    ,{field:'discovered', title:'已发现缺陷', width:110, sort: true, totalRow: true}
+                    ,{field:'resolved', title:'已关闭缺陷', width:110, sort: true, totalRow: true}
+                    ,{field:'unresolved', title:'未关闭缺陷', width:110, sort: true, totalRow: true}
+                    ,{field:'reopen', title:'重新打开缺陷', width:135, sort: true, totalRow: true}
+                    ,{field:'deadlineUnresolved', title:'到期未解决缺陷', width:145, style:'cursor: pointer;', event: 'deadlineSign', sort: true,  templet: '#Tpl1', totalRow: true}
+                    ,{field:'unresolvedSerious', title:'未关闭严重缺陷', width:145, style:'cursor: pointer;', event: 'seriousSign', sort: true,  templet: '#Tpl2', totalRow: true}
                 ]]
                 ,page: true,
                 limit:10
@@ -445,12 +422,35 @@
                     };
                 },
             });
-        });
+        }
 
+        function getDays(strDateStart,strDateEnd){
+            var strSeparator = "-"; //日期分隔符
+            var oDate1;
+            var oDate2;
+            var iDays;
+            oDate1= strDateStart.split(strSeparator);
+            oDate2= strDateEnd.split(strSeparator);
+            var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+            var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+            iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24);//把相差的毫秒数转换为天数
+            return iDays ;
+        }
 
         $=layui.jquery;
         //监听提交
         form.on('submit(demo1)', function(data){
+            //更新表格
+            var typeId = $("#productType").val();
+            var statusId = $("#productStatus").val();
+            var startTime = $("#date1").val();
+            var endTime = $("#date2").val();
+            var days = 7;
+            if (startTime != '' && endTime != '') {
+                days = getDays(startTime, endTime);
+            }
+            updateTable(typeId, statusId, days);
+
             var pids = [];
             // 获取勾选的项目pid
             for(key in data.field){
@@ -532,22 +532,7 @@
             }
         });
 
-/*        $.ajax({//查询bug时间段分布曲线图
-                type : "post",
-                dataType : "json",
-                data:{
-                    pids: JSON.stringify(pids),
-                    startTime:$("#date1").val(),
-                    endTime:$("#date2").val()
-                },
-                url : "/getBugDistributionByMonth",
-                success : function(data) {
-                    var Chart4 = echarts.init(document.getElementById('Chart4'));
-                    Chart4.setOption(stackedLine(data.legend,data.xAxis,data.series));
-                }
-            });*/
-
-            //查询截至当日未解决缺陷数量（复盘）
+        //查询截至当日未解决缺陷数量（复盘）
          $.ajax({
                 type : "post",
                 dataType : "json",
@@ -564,6 +549,23 @@
                 }
             });
 
+            //查询缺陷及时性
+            $.ajax({
+                type : "post",
+                dataType : "json",
+                data:{
+                    pids: JSON.stringify(pids),
+                    startTime:$("#date1").val(),
+                    endTime:$("#date2").val()
+                },
+                url : "/getBugTimeliness",
+                success : function(data) {
+                    // console.log(data)
+                    var Chart4 = echarts.init(document.getElementById('Chart4'));
+                    Chart4.setOption(timeliness(data.legend,data.xAxis,data.series));
+                }
+            });
+
         return false;
         });
 
@@ -572,13 +574,13 @@
         var Chart1 = echarts.init(document.getElementById('Chart1'));
         var Chart2 = echarts.init(document.getElementById('Chart2'));
         var Chart3 = echarts.init(document.getElementById('Chart3'));
-        // var Chart4 = echarts.init(document.getElementById('Chart4'));
+        var Chart4 = echarts.init(document.getElementById('Chart4'));
 
         // 使用刚指定的配置项和数据显示图表。
         Chart1.showLoading({text: '暂无数据'});
         Chart2.showLoading({text: '暂无数据'});
         Chart3.showLoading({text: '暂无数据'});
-        // Chart4.showLoading({text: '暂无数据'});
+        Chart4.showLoading({text: '暂无数据'});
     });
 
 
@@ -692,7 +694,36 @@
                 Chart3.setOption(replayLine(data.legend,data.xAxis,data.series));
             }
         });
+
+        //查询缺陷及时性
+        $.ajax({
+            type : "post",
+            dataType : "json",
+            data:{
+                pids: JSON.stringify(pids),
+                startTime: date1,
+                endTime: date2,
+            },
+            url : "/getBugTimeliness",
+            success : function(data) {
+                // console.log(data)
+                var Chart4 = echarts.init(document.getElementById('Chart4'));
+                Chart4.setOption(timeliness(data.legend,data.xAxis,data.series));
+            }
+        });
     });
+</script>
+
+<script type="text/html" id="Tpl1">
+    <span style="color: #0099FF;">{{ d.deadlineUnresolved }}</span>
+</script>
+
+<script type="text/html" id="Tpl2">
+    <span style="color: #0099FF;">{{ d.unresolvedSerious }}</span>
+</script>
+
+<script type="text/html" id="Tpl3">
+    <span style="color: #0099FF;">{{ d.title }}</span>
 </script>
 </body>
 </html>

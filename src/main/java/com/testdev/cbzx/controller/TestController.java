@@ -54,34 +54,14 @@ public class TestController {
         PoVo poVo = new PoVo();
         poVo.setStartTime(startTime);
         poVo.setEndTime(endTime);
-/*        List<Double> urgentData = new ArrayList<>();
-        List<Double> seriousData = new ArrayList<>();
-        List<Double> ordinaryData = new ArrayList<>();
-        List<Double> slightData = new ArrayList<>();
-        Map<String, Object> mapSeries = new HashMap<>();*/
+
         for (Object pid : idsArray) {
             pid = pid.toString();
             poVo.setPid(Integer.parseInt(pid.toString()));//对应的pid
             Bug spendDateInfo = bugDaoImpl.getBugSpendDate(poVo);
             SpendDateList.add(spendDateInfo);//返回结果
-
-/*                for (Bug bug : spendDateInfo) {
-                    if (bug.getSeverity() =="1") {
-                        urgentData.add(bug.getAverage());
-                    }else if (bug.getSeverity() == "2") {
-                        seriousData.add(bug.getAverage());
-                    }else if (bug.getSeverity() == "3") {
-                        ordinaryData.add(bug.getAverage());
-                    }else if (bug.getSeverity() == "4"){
-                        slightData.add(bug.getAverage());
-                    }
-                }*/
         }
-/*        mapSeries.put("data", urgentData);
-        mapSeries.put("data", seriousData);
-        mapSeries.put("data", ordinaryData);
-        mapSeries.put("data", slightData);
-        System.out.println(mapSeries);*/
+
         for (Bug bug : SpendDateList) {
             Map<String, Object> projectAvg = new HashMap<>();
             projectAvg.put("projectName", bug.getProjectName());//项目名
@@ -120,31 +100,6 @@ public class TestController {
         }
         return result;
     }
-
-    /**
-     * 查询缺陷周报表格-全部
-     * @param page
-     * @param limit
-     * @return result
-     */
-    /*@RequestMapping(value = "/getBugDistribution")
-    @ResponseBody
-    public Map<String, Object> getBugDistribution(Integer page,Integer limit) {
-        Map<String, Object> result = new HashMap<>();
-        PageHelper.startPage(page,limit);
-        List<Bug> allBugInfo = null;
-        try {
-            allBugInfo = bugDaoImpl.getBugDistribution();
-//            List<Bug> addinfo = bugDaoImpl.getBugDistributionByType(1);
-            PageInfo<Bug> pageInfo = new PageInfo<Bug>(allBugInfo);
-//            PageInfo<Bug> pageInfo1 = new PageInfo<>(addinfo);
-            result.put("total", pageInfo.getTotal());
-            result.put("data", pageInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }*/
 
     /**
      * 按时间段查各项目产生的缺陷数量（去曲线图）
@@ -223,11 +178,11 @@ public class TestController {
             result.put("legend", legend);
             result.put("xAxis", xAxis);
             result.put("series", series);
-//            System.out.println("series--"+series);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        System.out.println("result--"+result);
+
         return result;
     }
 
@@ -240,11 +195,11 @@ public class TestController {
      */
     @RequestMapping(value = "/getUnresolvedSeriousBug")
     @ResponseBody
-    public Map<String, Object> getUnresolvedSeriousBug(String project, Integer page, Integer limit) {
+    public Map<String, Object> getUnresolvedSeriousBug(String project, Integer days, Integer page, Integer limit) {
         Map<String, Object> result = new HashMap<>();
         PageHelper.startPage(page,limit);
         try {
-            List<Bug> seriousBugList = bugDaoImpl.getUnresolvedSeriousBug(Integer.parseInt(project));
+            List<Bug> seriousBugList = bugDaoImpl.getUnresolvedSeriousBug(Integer.parseInt(project), days);
             PageInfo<Bug> pageInfo = new PageInfo<Bug>(seriousBugList);
             result.put("total", pageInfo.getTotal());
             result.put("data", pageInfo);
@@ -330,30 +285,22 @@ public class TestController {
 
     /**
      * 查询缺陷周报表格
-     * @param type
      * @param  page
      * @param limit
      * @return result
      */
     @RequestMapping(value = "/getBugDistribution")
     @ResponseBody
-    public Map<String, Object> getBugDistribution(String type,Integer page,Integer limit) {
+    public Map<String, Object> getBugDistribution(String typeId, String statusId, Integer days, Integer page,Integer limit) {
         Map<String, Object> result = new HashMap<>();
         PageHelper.startPage(page,limit);
-        List<Bug> allBugInfo = null;
-        List<Bug> otherBugInfo = null;
         try {
-            if (type == "" || type == null) {
-                allBugInfo = bugDaoImpl.getBugDistribution();
-                otherBugInfo = bugDaoImpl.getOtherBugDistribution();
-            }else {
-                allBugInfo = bugDaoImpl.getBugDistributionByType(Integer.parseInt(type));
-                otherBugInfo = bugDaoImpl.getOtherBugDistributionByType(Integer.parseInt(type));
-            }
-            allBugInfo.addAll(otherBugInfo);
+            if (typeId == "") {typeId = null;}
+            if (statusId == "") {statusId = null;}
+            List<Bug> allBugInfo = bugDaoImpl.getBugDistribution(typeId, statusId, days);
+
             PageInfo<Bug> pageInfo = new PageInfo<Bug>(allBugInfo);
-            PageInfo<Bug> pageInfo1 = new PageInfo<>(otherBugInfo);
-            result.put("total", pageInfo.getTotal()+pageInfo1.getTotal());
+            result.put("total", pageInfo.getTotal());
             result.put("data", pageInfo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -382,11 +329,11 @@ public class TestController {
      */
     @RequestMapping(value = "/getDeadlineUnresolvedBug")
     @ResponseBody
-    public Map<String, Object> getDeadlineUnresolvedBug(String project, Integer page, Integer limit) {
+    public Map<String, Object> getDeadlineUnresolvedBug(String project,Integer days, Integer page, Integer limit) {
         Map<String, Object> deadline = new HashMap<>();
         PageHelper.startPage(page,limit);
         try {
-            List<Bug> deadlineUnresolved = bugDaoImpl.getDeadlineUnresolvedBug(Integer.parseInt(project));
+            List<Bug> deadlineUnresolved = bugDaoImpl.getDeadlineUnresolvedBug(Integer.parseInt(project), days);
             PageInfo<Bug> pageInfo = new PageInfo<>(deadlineUnresolved);
             deadline.put("total",pageInfo.getTotal());
             deadline.put("data",pageInfo);
@@ -427,6 +374,76 @@ public class TestController {
             e.printStackTrace();
         }
         return "redirect:/cbzx";
+    }
+
+    /**
+     * 缺陷及时性统计
+     * @param pids
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @RequestMapping(value = "/getBugTimeliness")
+    @ResponseBody
+    public Map<String,Object> getBugTimeliness(@RequestParam(value = "pids") String pids,String startTime, String endTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> dateList = new ArrayList<String>();//取出每一天
+        try{
+            Date dateOne = sdf.parse(startTime);
+            Date dateTwo = sdf.parse(endTime);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateOne);
+            dateList.add(startTime);
+            while(calendar.getTime().before(dateTwo)){ //倒序时间,顺序after改before其他相应的改动。
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                dateList.add(sdf.format(calendar.getTime()));
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        PoVo poVo = new PoVo();
+        poVo.setStartTime(startTime);
+        poVo.setEndTime(endTime);
+        Map<String, Object> result = new LinkedHashMap<>();//返回封装总数据
+        List<Map<String, Object>> series = new ArrayList<>();//series结果集
+        List<String> legend = new ArrayList<>();//legend结果集
+        JSONArray idArray = JSON.parseArray(pids);
+        String Seriesname = "";
+        for (Object pid : idArray) {//遍历pid
+//            pid = pid.toString();
+            poVo.setPid(Integer.parseInt(pid.toString()));
+            Map<String,Object> mapSeries = new HashMap<>();//每个pid对应的信息封装到Map
+            Map<String,Object> mapSeriesDiscovered = new HashMap<>();//时间段内已发现缺陷
+            List<Integer> listUnresolvedData = new ArrayList<>();
+            List<Integer> listDiscoveredData = new ArrayList<>();
+            mapSeries.put("type", "line");
+            //mapSeries.put("stack", "总量");
+            mapSeries.put("smooth", "true");
+            mapSeries.put("data", listUnresolvedData);//封装echart series数据
+            mapSeriesDiscovered.put("type", "line");
+            mapSeriesDiscovered.put("smooth", "true");
+            mapSeriesDiscovered.put("data", listDiscoveredData);//封装echart series数据-已发现
+            for (String date : dateList) {
+                date = date.toString();
+                poVo.setDate(date);
+                List<Bug> unresolved = bugDaoImpl.getBugTimeliness(poVo);
+                for (Bug bug : unresolved) {
+                    listUnresolvedData.add(bug.getDeadlineUnresolved());
+                    listDiscoveredData.add(bug.getDiscovered());
+                    Seriesname = bug.getProjectName();
+                }
+            }
+            mapSeries.put("name",Seriesname+"超期");//series中的name
+            mapSeriesDiscovered.put("name",Seriesname+"已发现");
+            legend.add(Seriesname+"已发现");
+            legend.add(Seriesname+"超期");
+            series.add(mapSeriesDiscovered);
+            series.add(mapSeries);
+        }
+        result.put("series", series);
+        result.put("xAxis",dateList);
+        result.put("legend",legend);
+        return result;
     }
 
 

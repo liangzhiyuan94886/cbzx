@@ -232,3 +232,52 @@ function replayLine(projectNmme,dataX,dataY){//复盘缺陷
     };
     return option;
 }
+
+function timeliness(projectNmme,dataX,dataY){//缺陷及时性
+    var option = {
+        title: {
+            text: ''
+        },
+        tooltip : {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        legend: {
+            data: projectNmme,
+        },
+        toolbox: {
+            feature: {
+                dataView: {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar', 'tiled','stack']},
+                restore: {show: true},
+                saveAsImage: {show: true}
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                data : dataX
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value',
+            }
+        ],
+        series : dataY,
+
+    };
+    return option;
+}
